@@ -4,7 +4,6 @@ defmodule WeatherApp.Controllers.Weather.ApiClient do
   defp api_key, do: System.get_env("OPENWEATHER_API_KEY")
 
   def search_cities(query) do
-    dbg(base_url())
     url = "#{base_url()}/geo/1.0/direct?q=#{query}&limit=10&appid=#{api_key()}"
 
     case HTTPoison.get(url) do

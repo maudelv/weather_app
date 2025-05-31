@@ -1,10 +1,11 @@
 defmodule WeatherApp.Controllers.Weather.ApiClient do
 
-  @geo_url Dotenv.get("OPENWEATHER_API_GEO_URL")
-  @api_key Dotenv.get("OPENWEATHER_API_KEY")
+  defp base_url, do: System.get_env("OPENWEATHER_API_BASE_URL")
+  defp api_key, do: System.get_env("OPENWEATHER_API_KEY")
 
   def search_cities(query) do
-    url = "#{@geo_url}/direct?q=#{query}&limit=10&appid=#{@api_key}"
+    dbg(base_url())
+    url = "#{base_url()}/geo/1.0/direct?q=#{query}&limit=10&appid=#{api_key()}"
 
     case HTTPoison.get(url) do
       {:ok, response} when response.status_code == 200 ->
@@ -20,6 +21,26 @@ defmodule WeatherApp.Controllers.Weather.ApiClient do
         {:error, reason}
     end
   end
+
+  @spec get_weather_data(float(), float()) :: {:ok, map()} | {:error, String.t()}
+  def get_weather_data(lat, lon) do
+    url = "#{base_url()}/weather?lat=#{lat}&lon=#{lon}&appid=#{api_key()}"
+
+    case HTTPoison.get(url) do
+      {:ok, response} when response.status_code == 200 ->
+        case Jason.decode(response.body) do
+          {:ok, decoded_response} ->
+            {:ok, decoded_response}
+          {:error, reason} ->
+            {:error, "JSON decode error: #{reason}"}
+        end
+      {:ok, %HTTPoison.Response{status_code: code}} ->
+        {:error, "Error: #{code}"}
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        {:error, reason}
+    end
+  end
+
 
   @doc """
   Validates the cities search response.

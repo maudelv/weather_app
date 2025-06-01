@@ -17,6 +17,7 @@ defmodule WeatherApp.Controllers.Weather.WeatherData do
   defp format_weather_display(weather_data) do
     %{
       temperature: weather_data["main"]["temp"],
+      original_temperature: weather_data["main"]["temp"],
       humidity: weather_data["main"]["humidity"],
       description: weather_data["weather"] |> List.first() |> Map.get("description"),
       wind_speed: weather_data["wind"]["speed"]

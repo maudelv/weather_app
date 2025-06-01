@@ -1,6 +1,4 @@
-# Personaliza el esquema generado en lib/my_app/weather/favorite_city.ex
-
-defmodule MyApp.Weather.FavoriteCity do
+defmodule WeatherApp.Schemas.FavoriteCity do
   use Ecto.Schema
   import Ecto.Changeset
 

@@ -3,6 +3,7 @@ defmodule WeatherAppWeb.WeatherLive do
 
   alias WeatherApp.Controllers.Weather.FindCities
   alias WeatherApp.Controllers.Weather.WeatherData
+  alias WeatherApp.Controllers.Weather.Favorites
 
   @impl true
   def mount(_params, _session, socket) do
@@ -77,6 +78,39 @@ defmodule WeatherAppWeb.WeatherLive do
     %{weather | temperature: Float.round(converted_temp, 1)}
   end
 
+  def handle_event("add_favorite_city", params, socket) do
+    with %{"country_code" => country_code, "lat" => lat, "lon" => lon} <- params,
+         {:ok, {lat_float, lon_float}} <- parse_coordinates(lat, lon) do
+
+      # Get current count of favorites to determine next position
+      current_count = Favorites.count_favorites()
+
+      city_data = %{
+        country_code: country_code,
+        state: Map.get(params, "state", ""),
+        lat: lat_float,
+        lon: lon_float,
+        position: current_count  # Sequential position based on current count
+      }
+
+      case Favorites.add_favorite(city_data) do
+        {:ok, _favorite_city} ->
+          socket = put_flash(socket, :info, "Ciudad añadida a favoritos.")
+          {:noreply, socket}
+        {:error, changeset} ->
+          error_messages = Enum.map_join(changeset.errors, ", ", fn {field, {msg, _opts}} ->
+            "#{Atom.to_string(field)} #{msg}"
+          end)
+          socket = put_flash(socket, :error, "Error al añadir a favoritos: #{error_messages}")
+          {:noreply, socket}
+      end
+    else
+      _mismatch_or_error ->
+        socket = put_flash(socket, :error, "Datos de ciudad inválidos para añadir a favoritos.")
+        {:noreply, socket}
+    end
+  end
+
   defp parse_coordinates(lat, lon) do
     try do
       lat_float = String.to_float(lat)
@@ -86,6 +120,7 @@ defmodule WeatherAppWeb.WeatherLive do
       ArgumentError -> {:error, "Invalid coordinates format"}
     end
   end
+
 
   def render(assigns) do
     ~H"""
@@ -120,6 +155,14 @@ defmodule WeatherAppWeb.WeatherLive do
           <li>
             <span><%= city["name"] %>, <%= city["country"] %></span>
             <button phx-click="get_weather" phx-value-lat={city["lat"]} phx-value-lon={city["lon"]}>Get Weather</button>
+            <button phx-click="add_favorite_city"
+                    phx-value-country_code={city["country"]}
+                    phx-value-state={city["state"]}
+                    phx-value-name={city["name"]}
+                    phx-value-lat={city["lat"]}
+                    phx-value-lon={city["lon"]}>
+              Añadir a Favoritas
+            </button>
           </li>
         <% end %>
       </ul>
@@ -133,6 +176,12 @@ defmodule WeatherAppWeb.WeatherLive do
           <p><strong>Viento:</strong> <%= @weather.wind_speed %> m/s</p>
         </div>
       <% end %>
+
+      <div class="favorite-cities">
+        <h2>Ciudades favoritas</h2>
+        <p>Aquí puedes agregar y gestionar tus ciudades favoritas.</p>
+        <!-- Aquí podrías implementar la lógica para manejar las ciudades favoritas -->
+      </div>
     </div>
     """
   end

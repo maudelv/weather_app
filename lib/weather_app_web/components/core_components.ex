@@ -101,6 +101,7 @@ defmodule WeatherAppWeb.CoreComponents do
   attr :flash, :map, default: %{}, doc: "the map of flash messages to display"
   attr :title, :string, default: nil
   attr :kind, :atom, values: [:info, :error], doc: "used for styling and flash lookup"
+  attr :timeout, :integer, default: 5000, doc: "duration in milliseconds before the flash auto-dismisses. 0 to disable."
   attr :rest, :global, doc: "the arbitrary HTML attributes to add to the flash container"
 
   slot :inner_block, doc: "the optional inner block that renders the flash message"
@@ -114,6 +115,8 @@ defmodule WeatherAppWeb.CoreComponents do
       id={@id}
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
       role="alert"
+      phx-hook={if @timeout > 0, do: "FlashTimer", else: nil}
+      data-timeout={if @timeout > 0, do: @timeout, else: nil}
       class={[
         "fixed top-2 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
         @kind == :info && "bg-emerald-50 text-emerald-800 ring-emerald-500 fill-cyan-900",

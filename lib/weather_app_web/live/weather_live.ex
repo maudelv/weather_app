@@ -7,15 +7,20 @@ defmodule WeatherAppWeb.WeatherLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, cities: [], weather: nil, error: nil, temperature_format: "celsius")}
+    {:ok,
+     assign(socket,
+       cities: [],
+       weather: nil,
+       temperature_format: "celsius",
+       error: nil,
+       favorite_cities: Favorites.list_favorites()
+     )}
   end
 
   def handle_event("change_temperature_format", %{"format" => format}, socket) do
-    # Actualizar el formato de temperatura y reconvertir si ya hay datos de clima
     socket = assign(socket, temperature_format: format)
 
     socket = if socket.assigns.weather do
-      # Si ya tenemos datos de clima, reconvertir la temperatura
       converted_weather = convert_temperature(socket.assigns.weather, format)
       assign(socket, weather: converted_weather)
     else
@@ -26,15 +31,14 @@ defmodule WeatherAppWeb.WeatherLive do
   end
 
   def handle_event("search_cities", params, socket) do
-    query = case params do
-      # If we try to get the query from a text input, submit form or an page load
-      # try to extract the value from expected cases.
-      %{"value" => q} -> q
-      %{"query" => q} -> q
-      _ -> ""
-    end
+    query =
+      (case params do
+         %{"value" => q} -> q
+         %{"query" => q} -> q
+         _ -> ""
+       end)
+      |> String.trim()
 
-    # Limpiar resultados anteriores
     socket = assign(socket, cities: [], error: nil)
 
     if query == "" do
@@ -53,26 +57,22 @@ defmodule WeatherAppWeb.WeatherLive do
   def handle_event("get_weather", %{"lat" => lat, "lon" => lon}, socket) do
     with {:ok, {lat_float, lon_float}} <- parse_coordinates(lat, lon),
         {:ok, weather} <- WeatherData.get_current_weather(lat_float, lon_float) do
-      # Convertir la temperatura al formato seleccionado antes de asignar
       converted_weather = convert_temperature(weather, socket.assigns.temperature_format)
       {:noreply, assign(socket, weather: converted_weather, error: nil)}
     else
       {:error, reason} ->
-        Logger.warning("Weather fetch failed: #{inspect(reason)}")
         {:noreply, assign(socket, error: reason)}
     end
   end
 
   defp convert_temperature(weather, format) do
-    # Usamos original_temperature como base para todos los cálculos
-    # ya que temperature puede haber sido modificada anteriormente
     temp_kelvin = weather.original_temperature
 
     converted_temp = case format do
       "celsius" -> temp_kelvin - 273.15
       "fahrenheit" -> (temp_kelvin - 273.15) * 9 / 5 + 32
       "kelvin" -> temp_kelvin
-      _ -> temp_kelvin - 273.15  # Default a celsius
+      _ -> temp_kelvin - 273.15
     end
 
     %{weather | temperature: Float.round(converted_temp, 1)}
@@ -82,26 +82,56 @@ defmodule WeatherAppWeb.WeatherLive do
     with %{"country_code" => country_code, "lat" => lat, "lon" => lon} <- params,
          {:ok, {lat_float, lon_float}} <- parse_coordinates(lat, lon) do
 
-      # Get current count of favorites to determine next position
       current_count = Favorites.count_favorites()
+
+      # TODO: 'state' en verdad no es necesario, por lo que podriamos removerlo, sin embargo para removerlo tenemos que corregir el unique_index en la migracion.
 
       city_data = %{
         country_code: country_code,
+        name: Map.get(params, "name", ""),
         state: Map.get(params, "state", ""),
         lat: lat_float,
         lon: lon_float,
-        position: current_count  # Sequential position based on current count
+        position: current_count
       }
 
-      case Favorites.add_favorite(city_data) do
-        {:ok, _favorite_city} ->
-          socket = put_flash(socket, :info, "Ciudad añadida a favoritos.")
+      try do
+        case Favorites.add_favorite(city_data) do
+          {:ok, _favorite_city} ->
+            # Actualizar la lista de favoritos en el socket
+            updated_favorites = Favorites.list_favorites()
+
+            socket =
+              socket
+              |> put_flash(:info, "Ciudad añadida a favoritos.")
+              |> assign(:favorite_cities, updated_favorites)
+
+            {:noreply, socket}
+
+          {:error, changeset} ->
+            custom_error_message =
+              Enum.find_value(changeset.errors, fn {field, {msg, opts}} ->
+                is_unique_favorite_error =
+                  Keyword.get(opts, :constraint_name) == :favorite_cities_country_code_state_lat_lon_index ||
+                    (Keyword.get(opts, :constraint) == :unique &&
+                       String.contains?(msg, "ya está en favoritos"))
+
+                if is_unique_favorite_error do
+                  "Error: Esta ciudad ya está en favoritos."
+                else
+                  "Error al añadir: #{Atom.to_string(field)} #{msg}"
+                end
+              end) || "Error al añadir la ciudad a favoritos. Verifique los datos."
+
+            socket = put_flash(socket, :error, custom_error_message)
+            {:noreply, socket}
+        end
+      rescue
+        e in Ecto.ConstraintError ->
+          socket = put_flash(socket, :error, "Error: Esta ciudad ya está en favoritos.")
           {:noreply, socket}
-        {:error, changeset} ->
-          error_messages = Enum.map_join(changeset.errors, ", ", fn {field, {msg, _opts}} ->
-            "#{Atom.to_string(field)} #{msg}"
-          end)
-          socket = put_flash(socket, :error, "Error al añadir a favoritos: #{error_messages}")
+        e ->
+          socket = put_flash(socket, :error, "Error inesperado al procesar la solicitud.")
           {:noreply, socket}
       end
     else
@@ -117,10 +147,25 @@ defmodule WeatherAppWeb.WeatherLive do
       lon_float = String.to_float(lon)
       {:ok, {lat_float, lon_float}}
     rescue
-      ArgumentError -> {:error, "Invalid coordinates format"}
+      ArgumentError -> {:error, "Formato de coordenadas inválido. Asegúrate de que son números."}
     end
   end
 
+  def handle_event("remove_favorite_city", %{"id" => id}, socket) do
+    case Favorites.delete_favorite(id) do
+      {:ok, _} ->
+        favorite_cities = Favorites.list_favorites()
+        socket =
+          socket
+          |> assign(:favorite_cities, favorite_cities)
+          |> put_flash(:info, "Ciudad eliminada de favoritos.")
+
+        {:noreply, socket}
+      {:error, _} ->
+        socket = put_flash(socket, :error, "Error al eliminar ciudad de favoritos.")
+        {:noreply, socket}
+    end
+  end
 
   def render(assigns) do
     ~H"""
@@ -179,8 +224,45 @@ defmodule WeatherAppWeb.WeatherLive do
 
       <div class="favorite-cities">
         <h2>Ciudades favoritas</h2>
-        <p>Aquí puedes agregar y gestionar tus ciudades favoritas.</p>
-        <!-- Aquí podrías implementar la lógica para manejar las ciudades favoritas -->
+
+        <%= if Enum.empty?(@favorite_cities) do %>
+          <p>No tienes ciudades favoritas aún. Busca una ciudad y agrégala a favoritos.</p>
+        <% else %>
+          <div class="favorite-cities-list">
+            <%= for favorite <- @favorite_cities do %>
+              <div class="favorite-city-item">
+                <div class="city-info">
+                  <h3><%= favorite.country_code %></h3>
+                  <%= if favorite.name do %>
+                    <p class="name"><%= favorite.name %></p>
+                  <% end %>
+                </div>
+
+                <div class="city-actions">
+                  <button
+                    type="button"
+                    phx-click="get_weather"
+                    phx-value-lat={favorite.lat}
+                    phx-value-lon={favorite.lon}
+                    class="btn btn-primary"
+                  >
+                    Ver clima
+                  </button>
+
+                  <button
+                    type="button"
+                    phx-click="remove_favorite_city"
+                    phx-value-id={favorite.id}
+                    class="btn btn-danger"
+                    data-confirm="¿Estás seguro de eliminar esta ciudad de favoritos?"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
       </div>
     </div>
     """

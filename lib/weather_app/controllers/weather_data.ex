@@ -7,8 +7,10 @@ defmodule WeatherApp.Controllers.Weather.WeatherData do
 
   def get_current_weather(lat, lon) do
     case ApiClient.get_weather_data(lat, lon) do
-      {:ok, weather_data} -> format_weather_display(weather_data)
-      {:error, reason} -> {:error, reason}
+      {:ok, weather_data} ->
+        {:ok, format_weather_display(weather_data)}
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 

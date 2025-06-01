@@ -8,21 +8,30 @@ defmodule WeatherApp.Controllers.Weather.FindCities do
   @doc """
   Searches for cities based on the provided query.
   """
-  def find_cities(query) when is_binary(query) and byte_size(query) >= 2 do
-    case ApiClient.search_cities(query) do
-      {:ok, cities} -> {:ok, cities}
+  def find_cities(query) do
+    with {:ok, validated_query} <- validate_query(query),
+         {:ok, cities} <- ApiClient.search_cities(validated_query) do
+      {:ok, deduplicate_cities(cities)}
+    else
+      {:error, :empty_result} -> {:ok, []}
       {:error, reason} -> {:error, reason}
     end
   end
 
-  # Handle queries shorter than 2 characters
-  def find_cities(query) when is_binary(query) and byte_size(query) < 2 do
-    {:ok, []}
+  defp deduplicate_cities(cities) do
+    Enum.uniq_by(cities, fn city -> {city["name"], city["country"]} end)
   end
 
-  # Catch-all for any other type of query, though less likely with LiveView input
-  def find_cities(_) do
-    {:ok, []}
+  defp validate_query(query) when is_binary(query) and byte_size(query) >= 2 do
+    {:ok, query}
+  end
+
+  defp validate_query(query) when is_binary(query) and byte_size(query) < 2 do
+    {:error, :empty_result}
+  end
+
+  defp validate_query(_) do
+    {:error, :empty_result}
   end
 
   def format_city_options(cities) do

@@ -115,10 +115,9 @@ Para levantar la aplicación usando Docker Compose, sigue estos pasos:
 
 1.  **Clonar el Repositorio:**
     ```bash
-    git clone [URL_DEL_REPOSITORIO]
+    git clone https://github.com/maudelv/weather_app
     cd weather_app
     ```
-    (Reemplaza `[URL_DEL_REPOSITORIO]` con la URL real de tu repositorio.)
 
 2.  **Configurar Variables de Entorno:**
     Copia el archivo de ejemplo y edita las variables necesarias (ej. claves de API):
@@ -145,4 +144,4 @@ Para levantar la aplicación usando Docker Compose, sigue estos pasos:
 
 Para detener los servicios y remover los contenedores, redes y volúmenes creados por `docker-compose`:
 ```bash
-docker-compose down -v
+docker-compose down

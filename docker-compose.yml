@@ -1,0 +1,36 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: weather_app:latest
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      PHX_HOST: localhost
+      PORT: 4000
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
+      OPENWEATHER_API_BASE_URL: ${OPENWEATHER_API_BASE_URL}
+    env_file:
+      - .env
+    command: >
+      sh -c "/app/bin/migrate &&
+             /app/bin/server"
+  db:
+    image: postgres:13-alpine # Consider upgrading to a more recent Postgres version if possible
+    restart: always
+    environment:
+      POSTGRES_DB: weather_app_prod
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  db_data:

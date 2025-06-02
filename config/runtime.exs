@@ -97,3 +97,8 @@ if config_env() == :prod do
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.
 end
+
+# OpenWeather API configuration
+config :weather_app, :openweather,
+  api_key: System.get_env("OPENWEATHER_API_KEY"),
+  api_base_url: System.get_env("OPENWEATHER_API_BASE_URL")

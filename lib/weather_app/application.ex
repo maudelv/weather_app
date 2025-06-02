@@ -7,7 +7,6 @@ defmodule WeatherApp.Application do
 
   @impl true
   def start(_type, _args) do
-    Dotenv.load(".env")
     children = [
       WeatherAppWeb.Telemetry,
       WeatherApp.Repo,

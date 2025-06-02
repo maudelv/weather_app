@@ -23,10 +23,10 @@ defmodule WeatherApp.Controllers.Weather.ApiClient do
     end
   end
 
-  @spec get_weather_data(float(), float()) :: {:ok, map()} | {:error, String.t()}
-  def get_weather_data(lat, lon) do
-    url = "#{base_url()}/data/2.5/weather?lat=#{lat}&lon=#{lon}&appid=#{api_key()}"
-
+  # Expected values in unit_measurement: "standard" (Kelvin), "metric" (Celsius), "imperial" (Fahrenheit)
+  @spec get_weather_data(float(), float(), String.t()) :: {:ok, map()} | {:error, String.t()}
+  def get_weather_data(lat, lon, unit_measurement) do
+    url = "#{base_url()}/data/3.0/onecall?lat=#{lat}&lon=#{lon}&exclude=minutely,alerts&appid=#{api_key()}&units=#{unit_measurement}&lang=es"
     case HTTPoison.get(url) do
       {:ok, response} when response.status_code == 200 ->
         case Jason.decode(response.body) do

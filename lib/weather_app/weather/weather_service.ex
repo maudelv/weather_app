@@ -23,7 +23,7 @@ defmodule WeatherApp.Weather.WeatherService do
     socket = Phoenix.Component.assign(socket, temperature_format: format)
 
     if socket.assigns.weather do
-      converted_weather = TemperatureConverter.convert(socket.assigns.weather, format)
+      converted_weather = TemperatureConverter.convert_weather_data(socket.assigns.weather, format)
       Phoenix.Component.assign(socket, weather: converted_weather)
     else
       socket
@@ -50,8 +50,9 @@ defmodule WeatherApp.Weather.WeatherService do
   @spec fetch_weather_data(Socket.t(), String.t(), String.t()) :: Socket.t()
   def fetch_weather_data(socket, lat, lon) do
     with {:ok, {lat_float, lon_float}} <- parse_coordinates(lat, lon),
-         {:ok, weather} <- WeatherData.get_current_weather(lat_float, lon_float) do
-      converted_weather = TemperatureConverter.convert(weather, socket.assigns.temperature_format)
+         {:ok, weather} <- WeatherData.get_current_weather(lat_float, lon_float, "metric") do
+      converted_weather = TemperatureConverter.convert_weather_data(weather, socket.assigns.temperature_format)
+      IO.inspect(converted_weather, label: "Converted Weather Data")
       Phoenix.Component.assign(socket, weather: converted_weather, error: nil)
     else
       {:error, reason} ->

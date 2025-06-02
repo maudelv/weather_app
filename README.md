@@ -109,7 +109,7 @@ Esta arquitectura establece una base **modular y escalable** para la aplicación
 
 La arquitectura está preparada para soportar el crecimiento futuro y facilita el desarrollo colaborativo manteniendo alta calidad de código.
 
-## Instalación y Ejecución con Docker Compose
+## Instalación usando Docker Compose
 
 Para levantar la aplicación usando Docker Compose, sigue estos pasos:
 
@@ -133,12 +133,6 @@ Para levantar la aplicación usando Docker Compose, sigue estos pasos:
 
 4.  **Acceder a la Aplicación:**
     Una vez que los servicios estén levantados, la aplicación estará disponible en [`localhost:4000`](http://localhost:4000).
-
-5.  **Ejecutar Migraciones de Base de Datos (si es necesario):**
-    Si hay nuevas migraciones de base de datos, puedes ejecutarlas dentro del contenedor de la aplicación:
-    ```bash
-    docker-compose exec app mix ecto.migrate
-    ```
 
 ## Para Detener y Limpiar
 

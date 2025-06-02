@@ -54,7 +54,7 @@ defmodule WeatherAppWeb.WeatherLive.Components.WeatherDisplayComponent do
 
               <div class="weather-item bg-blue-50 p-4 rounded-md shadow-sm sm:col-span-2 md:col-span-1"> <!-- Ajuste para ocupar toda la fila en sm si es el tercero, o una columna en md+ -->
                 <span class="weather-label block text-sm font-medium text-blue-600 mb-1">Viento:</span>
-                <span class="weather-value text-m font-semibold text-blue-800"><%= Float.round(@weather.current_weather.wind_speed, 1) %> <%= @weather.current_weather.wind_speed_unit %></span>
+                <span class="weather-value text-m font-semibold text-blue-800"><%= @weather.current_weather.wind_speed %> <%= @weather.current_weather.wind_speed_unit %></span>
               </div>
 
             </div>
@@ -82,7 +82,7 @@ defmodule WeatherAppWeb.WeatherLive.Components.WeatherDisplayComponent do
                   💧 <%= hour.humidity %>%
                 </div>
                 <div class="hour-wind text-xs text-blue-500 mt-0.5">
-                  💨 <%= Float.round(hour.wind_speed, 1) %> <%= hour.wind_speed_unit %>
+                  💨 <%= hour.wind_speed %> <%= hour.wind_speed_unit %>
                 </div>
               </div>
             <% end %>
@@ -122,7 +122,7 @@ defmodule WeatherAppWeb.WeatherLive.Components.WeatherDisplayComponent do
 
                 <div class="day-details text-xs text-blue-500 mt-1">
                   <span class="day-humidity inline-block mr-2">💧 <%= day.humidity %>%</span>
-                  <span class="day-wind inline-block">💨 <%= Float.round(day.wind_speed, 1) %> <%= day.wind_speed_unit %></span>
+                  <span class="day-wind inline-block">💨 <%= day.wind_speed %> <%= day.wind_speed_unit %></span>
                 </div>
               </div>
             <% end %>

@@ -44,10 +44,6 @@ defmodule WeatherApp.Controllers.Weather.ApiClient do
     end
   end
 
-
-  @doc """
-  Validates the cities search response.
-  """
   defp validate_cities_response(response) do
     case response do
       [] -> {:error, "No se ha encontrado ningina ciudad con ese nombre."}

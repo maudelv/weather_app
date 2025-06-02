@@ -26,71 +26,76 @@ defmodule WeatherAppWeb.WeatherLive.Components.CitySearchComponent do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="city-search col-span-3 shadow-lg p-4 mb-4 bg-white rounded">
-      <div class="search-header d-flex justify-content-between">
-        <h2 class="text-lg">Buscar ciudad</h2>
-      </div>
-      <div class="search-form">
-        <form phx-submit="search_cities" phx-target={@myself}>
-          <input
-            class="text-sm font-medium text-gray-900 light:text-white rounded"
-            type="text"
-            name="value"
-            phx-debounce="300"
-            phx-keyup="search_cities"
-            phx-target={@myself}
-            placeholder="Introduce el nombre de la ciudad"
-            required
-          />
-          <button type="submit" class="mt-3 text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700">Buscar</button>
-        </form>
-      </div>
-
-      <%= if @error do %>
-        <p class="error"><%= @error %></p>
-      <% end %>
-
-      <%= if not Enum.empty?(@cities) do %>
-        <div class="cities-list">
-          <ul>
-            <%= for city <- @cities do %>
-              <li class="city-item mb-1">
-                <div class="city-info mt-2 mb-2">
-                    <span class="text-medium text-gray-700 mb-2"><%= city["name"] %>, <%= city["country"] %></span>
-                <hr />
-                </div>
-                <div class="city-actions d-flex">
-                    <button
-                    phx-click="get_weather"
-                    phx-target={@myself}
-                    phx-value-lat={city["lat"]}
-                    phx-value-lon={city["lon"]}
-                    class="text-blue-700 border border-blue-700 hover:bg-blue-700 hover:text-white font-small p-1 px-3 pr-3 rounded-lg text-sm text-center inline-flex items-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white"
-                  >
-                    Ver Clima
-                  </button>
-
-                  <button
-                    phx-click="add_favorite_city"
-                    phx-target={@myself}
-                    phx-value-country_code={city["country"]}
-                    phx-value-state={city["state"]}
-                    phx-value-name={city["name"]}
-                    phx-value-lat={city["lat"]}
-                    phx-value-lon={city["lon"]}
-                    class="text-blue-700 border border-blue-700 hover:bg-blue-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-small p-2 rounded-lg text-sm text-center inline-flex items-center me-2 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:focus:ring-blue-800 dark:hover:bg-blue-500"
-                  >
-                  <svg class="w-3 h-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
-                    <path d="M3 7H1a1 1 0 0 0-1 1v8a2 2 0 0 0 4 0V8a1 1 0 0 0-1-1Zm12.954 0H12l1.558-4.5a1.778 1.778 0 0 0-3.331-1.06A24.859 24.859 0 0 1 6 6.8v9.586h.114C8.223 16.969 11.015 18 13.6 18c1.4 0 1.592-.526 1.88-1.317l2.354-7A2 2 0 0 0 15.954 7Z"/>
-                  </svg>
-                  </button>
-                </div>
-              </li>
-            <% end %>
-          </ul>
+      <div class="city-search col-span-3 shadow-lg p-6 mb-6 bg-white rounded-lg">
+        <div class="search-header flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-blue-700">Buscar ciudad</h2>
         </div>
-      <% end %>
-    </div>
+        <div class="search-form">
+          <form phx-submit="search_cities" phx-target={@myself} class="space-y-4">
+            <div>
+              <label for="city_search_input" class="sr-only">Introduce el nombre de la ciudad</label>
+              <input
+                id="city_search_input"
+                class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-900 placeholder-gray-500"
+                type="text"
+                name="value"
+                phx-debounce="300"
+                phx-keyup="search_cities"
+                phx-target={@myself}
+                placeholder="Introduce el nombre de la ciudad"
+                required
+              />
+            </div>
+            <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Buscar</button>
+          </form>
+        </div>
+
+        <%= if @error do %>
+          <p class="error mt-4 p-3 text-sm text-red-700 bg-red-100 border border-red-300 rounded-md"><%= @error %></p>
+        <% end %>
+
+        <%= if not Enum.empty?(@cities) do %>
+          <div class="cities-list mt-6">
+            <ul class="space-y-3">
+              <%= for city <- @cities do %>
+                <li class="city-item p-4 bg-blue-50 border border-blue-200 rounded-md shadow-sm">
+                  <div class="city-info flex justify-between items-center mb-2">
+                      <span class="text-md font-semibold text-blue-800"><%= city["name"] %>, <%= city["country"] %></span>
+                  </div>
+                  <div class="city-actions flex space-x-2">
+                      <button
+                      phx-click="get_weather"
+                      phx-target={@myself}
+                      phx-value-lat={city["lat"]}
+                      phx-value-lon={city["lon"]}
+                      class="text-blue-700 border border-blue-700 hover:bg-blue-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs px-4 py-2 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:focus:ring-blue-800 dark:hover:bg-blue-500"
+                    >
+                      Ver Clima
+                    </button>
+
+                    <button
+                      phx-click="add_favorite_city"
+                      phx-target={@myself}
+                      phx-value-country_code={city["country"]}
+                      phx-value-state={city["state"]}
+                      phx-value-name={city["name"]}
+                      phx-value-lat={city["lat"]}
+                      phx-value-lon={city["lon"]}
+                      class="text-blue-700 border border-blue-700 hover:bg-blue-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium p-2 rounded-lg text-xs text-center inline-flex items-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:focus:ring-blue-800 dark:hover:bg-blue-500"
+                      title="Añadir a favoritos"
+                    >
+                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
+                      <path d="M3 7H1a1 1 0 0 0-1 1v8a2 2 0 0 0 4 0V8a1 1 0 0 0-1-1Zm12.954 0H12l1.558-4.5a1.778 1.778 0 0 0-3.331-1.06A24.859 24.859 0 0 1 6 6.8v9.586h.114C8.223 16.969 11.015 18 13.6 18c1.4 0 1.592-.526 1.88-1.317l2.354-7A2 2 0 0 0 15.954 7Z"/>
+                    </svg>
+                    <span class="sr-only">Añadir a favoritos</span>
+                    </button>
+                  </div>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+      </div>
     """
   end
 

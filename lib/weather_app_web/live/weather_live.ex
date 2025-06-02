@@ -63,7 +63,7 @@ defmodule WeatherAppWeb.WeatherLive do
     ~H"""
     <div class="weather-app p-4">
       <div class="grid grid-cols-12 gap-x-4">
-        <div class="col-span-5 space-y-4">
+        <div class="col-span-3 space-y-4">
           <.live_component
             module={CitySearchComponent}
             id="city-search"
@@ -81,7 +81,7 @@ defmodule WeatherAppWeb.WeatherLive do
             favorite_cities={@favorite_cities}
           />
         </div>
-        <div class="col-span-6 shadow-lg p-4 mb-4 bg-white rounded">
+        <div class="col-span-9 shadow-lg p-4 mb-4 bg-white rounded">
           <.live_component
             module={WeatherDisplayComponent}
             id="weather-display"

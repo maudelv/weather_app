@@ -67,9 +67,9 @@ defmodule WeatherApp.Controllers.Weather.Favorites do
   end
 
   @doc """
-  Checks if a city is a favorite by city ID.
+  Checks if a city is a favorite by ID.
   """
-  def is_favorite?(city_id) do
-    Repo.exists?(from f in FavoriteCity, where: f.city_id == ^city_id)
+  def is_favorite?(id) do
+    Repo.exists?(from f in FavoriteCity, where: f.id == ^id)
   end
 end

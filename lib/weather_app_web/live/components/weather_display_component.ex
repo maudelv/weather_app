@@ -150,13 +150,4 @@ defmodule WeatherAppWeb.WeatherLive.Components.WeatherDisplayComponent do
       7 -> "Dom"
     end
   end
-
-  # Función auxiliar para obtener descripción del clima
-  defp get_day_description(weather_list) when is_list(weather_list) do
-    weather_list
-    |> List.first()
-    |> Map.get("description", "")
-    |> String.capitalize()
-  end
-  defp get_day_description(_), do: ""
 end

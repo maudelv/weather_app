@@ -1,12 +1,19 @@
 defmodule WeatherApp.Controllers.Weather.ApiClient do
+  @moduledoc """
+  Client for interacting with the OpenWeather API.
+  This module provides functions to search for cities and retrieve weather data.
+  """
+
+  # Permitir inyección de dependencias para testing
+  @http_client Application.compile_env(:weather_app, :http_client, HTTPoison)
 
   defp base_url, do: System.get_env("OPENWEATHER_API_BASE_URL")
   defp api_key, do: System.get_env("OPENWEATHER_API_KEY")
 
-  def search_cities(query) do
+  def search_cities(query, http_client \\ @http_client) do
     url = "#{base_url()}/geo/1.0/direct?q=#{query}&limit=10&appid=#{api_key()}"
 
-    case HTTPoison.get(url) do
+    case http_client.get(url) do
       {:ok, response} when response.status_code == 200 ->
         case Jason.decode(response.body) do
           {:ok, decoded_response} ->
@@ -23,11 +30,11 @@ defmodule WeatherApp.Controllers.Weather.ApiClient do
     end
   end
 
-  # Expected values in unit_measurement: "standard" (Kelvin), "metric" (Celsius), "imperial" (Fahrenheit)
-  @spec get_weather_data(float(), float(), String.t()) :: {:ok, map()} | {:error, String.t()}
-  def get_weather_data(lat, lon, unit_measurement) do
+  @spec get_weather_data(float(), float(), String.t(), module()) :: {:ok, map()} | {:error, String.t()}
+  def get_weather_data(lat, lon, unit_measurement, http_client \\ @http_client) do
     url = "#{base_url()}/data/3.0/onecall?lat=#{lat}&lon=#{lon}&exclude=minutely,alerts&appid=#{api_key()}&units=#{unit_measurement}&lang=es"
-    case HTTPoison.get(url) do
+
+    case http_client.get(url) do
       {:ok, response} when response.status_code == 200 ->
         case Jason.decode(response.body) do
           {:ok, decoded_response} ->

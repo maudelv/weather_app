@@ -14,6 +14,7 @@ defmodule WeatherApp.Controllers.Weather.FindCities do
       {:ok, deduplicate_cities(cities)}
     else
       {:error, :empty_result} -> {:ok, []}
+      {:error, "No se ha encontrado ningina ciudad con ese nombre."} -> {:ok, []}
       {:error, reason} -> {:error, reason}
     end
   end

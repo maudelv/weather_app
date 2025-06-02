@@ -52,7 +52,6 @@ defmodule WeatherApp.Weather.WeatherService do
     with {:ok, {lat_float, lon_float}} <- parse_coordinates(lat, lon),
          {:ok, weather} <- WeatherData.get_current_weather(lat_float, lon_float, "metric") do
       converted_weather = TemperatureConverter.convert_weather_data(weather, socket.assigns.temperature_format)
-      IO.inspect(converted_weather, label: "Converted Weather Data")
       Phoenix.Component.assign(socket, weather: converted_weather, error: nil)
     else
       {:error, reason} ->

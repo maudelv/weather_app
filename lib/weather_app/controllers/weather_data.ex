@@ -59,13 +59,19 @@ defmodule WeatherApp.Controllers.Weather.WeatherData do
   end
 
   # Funciones auxiliares para extraer datos de forma segura
-  defp get_weather_description(weather_list) when is_list(weather_list) do
-    weather_list |> List.first() |> Map.get("description", "")
+  defp get_weather_description(weather_list) when is_list(weather_list) and length(weather_list) > 0 do
+    case List.first(weather_list) do
+      %{} = weather_map -> Map.get(weather_map, "description", "")
+      _ -> ""
+    end
   end
   defp get_weather_description(_), do: ""
 
-  defp get_weather_icon(weather_list) when is_list(weather_list) do
-    weather_list |> List.first() |> Map.get("icon", "")
+  defp get_weather_icon(weather_list) when is_list(weather_list) and length(weather_list) > 0 do
+    case List.first(weather_list) do
+      %{} = weather_map -> Map.get(weather_map, "icon", "")
+      _ -> ""
+    end
   end
   defp get_weather_icon(_), do: ""
 end

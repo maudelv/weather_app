@@ -1,4 +1,55 @@
-# Weather App - Diseño de Arquitectura
+# Weather App
+
+## Configuración
+
+- Erlang 27
+- Elixir 1.17.3
+- Docker
+
+## Requisitos
+
+En las variables de entorno, ha de estar configurado las siguientes variables:
+
+```bash
+DATABASE_URL="database_url"
+SECRET_KEY_BASE=your_secret_key_base_here
+OPENWEATHER_API_KEY=your_api_key_here
+OPENWEATHER_API_BASE_URL=https://api.openweathermap.org
+```
+
+Se esta utilizando la API de OneCall 3.0 de OpenWeather, por lo que se requiere activar esta funcionalidad.
+
+## Instalación usando Docker Compose
+
+Para levantar la aplicación usando Docker Compose, sigue estos pasos:
+
+1.  **Clonar el Repositorio:**
+    ```bash
+    git clone https://github.com/maudelv/weather_app
+    cd weather_app
+    ```
+
+2.  **Configurar Variables de Entorno:**
+    Copia el archivo de ejemplo y edita las variables necesarias (ej. claves de API):
+    ```bash
+    cp .env.template .env
+    ```
+
+3.  **Levantar Servicios con Docker Compose:**
+    ```bash
+    docker-compose up --build
+    ```
+    Esto construirá las imágenes de Docker y levantará los contenedores de la aplicación y la base de datos.
+
+4.  **Acceder a la Aplicación:**
+    Una vez que los servicios estén levantados, la aplicación estará disponible en [`localhost:4000`](http://localhost:4000).
+
+## Para Detener y Limpiar
+
+Para detener los servicios y remover los contenedores, redes y volúmenes creados por `docker-compose`:
+```bash
+docker-compose down
+```
 
 ## Diseño de Arquitectura
 
@@ -102,40 +153,3 @@
 2. **Cache**
 3. **Telemetría**
 4. **Loggers Estructurados**
-
-## Conclusión
-
-Esta arquitectura establece una base **modular y escalable** para la aplicación, siguiendo principios SOLID y patrones probados de Phoenix LiveView. Aunque introduce una complejidad inicial, los beneficios a largo plazo en mantenibilidad, testabilidad y escalabilidad justifican ampliamente la inversión.
-
-La arquitectura está preparada para soportar el crecimiento futuro y facilita el desarrollo colaborativo manteniendo alta calidad de código.
-
-## Instalación usando Docker Compose
-
-Para levantar la aplicación usando Docker Compose, sigue estos pasos:
-
-1.  **Clonar el Repositorio:**
-    ```bash
-    git clone https://github.com/maudelv/weather_app
-    cd weather_app
-    ```
-
-2.  **Configurar Variables de Entorno:**
-    Copia el archivo de ejemplo y edita las variables necesarias (ej. claves de API):
-    ```bash
-    cp .env.template .env
-    ```
-
-3.  **Levantar Servicios con Docker Compose:**
-    ```bash
-    docker-compose up --build
-    ```
-    Esto construirá las imágenes de Docker y levantará los contenedores de la aplicación y la base de datos.
-
-4.  **Acceder a la Aplicación:**
-    Una vez que los servicios estén levantados, la aplicación estará disponible en [`localhost:4000`](http://localhost:4000).
-
-## Para Detener y Limpiar
-
-Para detener los servicios y remover los contenedores, redes y volúmenes creados por `docker-compose`:
-```bash
-docker-compose down

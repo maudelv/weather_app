@@ -77,26 +77,33 @@ defmodule WeatherApp.Weather.WeatherService do
 
   @spec add_city_to_favorites(Socket.t(), map()) :: Socket.t()
   def add_city_to_favorites(socket, params) do
-    with %{"country_code" => country_code, "lat" => lat, "lon" => lon} <- params,
-         {:ok, {lat_float, lon_float}} <- parse_coordinates(lat, lon) do
+    # Check if we already have 5 favorite cities
+    current_count = Favorites.count_favorites()
 
-      city_data = build_city_data(params, country_code, lat_float, lon_float)
-
-      case Favorites.add_favorite(city_data) do
-        {:ok, _favorite_city} ->
-          updated_favorites = Favorites.list_favorites()
-
-          socket
-          |> Phoenix.LiveView.put_flash(:info, "Ciudad añadida a favoritos.")
-          |> Phoenix.Component.assign(:favorite_cities, updated_favorites)
-
-        {:error, changeset} ->
-          error_message = build_favorite_error_message(changeset)
-          Phoenix.LiveView.put_flash(socket, :error, error_message)
-      end
+    if current_count >= 5 do
+      Phoenix.LiveView.put_flash(socket, :error, "No puedes añadir más de 5 ciudades a favoritos.")
     else
-      _error ->
-        Phoenix.LiveView.put_flash(socket, :error, "Datos de ciudad inválidos para añadir a favoritos.")
+      with %{"country_code" => country_code, "lat" => lat, "lon" => lon} <- params,
+           {:ok, {lat_float, lon_float}} <- parse_coordinates(lat, lon) do
+
+        city_data = build_city_data(params, country_code, lat_float, lon_float)
+
+        case Favorites.add_favorite(city_data) do
+          {:ok, _favorite_city} ->
+            updated_favorites = Favorites.list_favorites()
+
+            socket
+            |> Phoenix.LiveView.put_flash(:info, "Ciudad añadida a favoritos.")
+            |> Phoenix.Component.assign(:favorite_cities, updated_favorites)
+
+          {:error, changeset} ->
+            error_message = build_favorite_error_message(changeset)
+            Phoenix.LiveView.put_flash(socket, :error, error_message)
+        end
+      else
+        _error ->
+          Phoenix.LiveView.put_flash(socket, :error, "Datos de ciudad inválidos para añadir a favoritos.")
+      end
     end
   rescue
     Ecto.ConstraintError ->

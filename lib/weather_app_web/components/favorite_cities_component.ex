@@ -21,7 +21,10 @@ defmodule WeatherAppWeb.WeatherLive.Components.FavoriteCitiesComponent do
   def render(assigns) do
     ~H"""
     <div class="favorite-cities shadow-lg p-6 mb-6 bg-white rounded-lg">
-      <h2 class="block text-md font-medium text-gray-700">Ciudades favoritas</h2>
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="block text-md font-medium text-gray-700">Ciudades favoritas</h2>
+        <span class="text-sm text-gray-500">(<%= length(@favorite_cities) %>/5)</span>
+      </div>
 
       <%= if Enum.empty?(@favorite_cities) do %>
         <div class="no-favorites text-center py-6 px-4 bg-blue-50 rounded-md border border-blue-200">

@@ -101,7 +101,11 @@ defmodule WeatherAppWeb.CoreComponents do
   attr :flash, :map, default: %{}, doc: "the map of flash messages to display"
   attr :title, :string, default: nil
   attr :kind, :atom, values: [:info, :error], doc: "used for styling and flash lookup"
-  attr :timeout, :integer, default: 5000, doc: "duration in milliseconds before the flash auto-dismisses. 0 to disable."
+
+  attr :timeout, :integer,
+    default: 5000,
+    doc: "duration in milliseconds before the flash auto-dismisses. 0 to disable."
+
   attr :rest, :global, doc: "the arbitrary HTML attributes to add to the flash container"
 
   slot :inner_block, doc: "the optional inner block that renders the flash message"

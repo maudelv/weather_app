@@ -18,7 +18,9 @@ defmodule WeatherAppWeb.WeatherLive.Components.TemperatureFormatComponent do
     <div class="temperature-format-selector shadow-lg p-4 mb-6 bg-white rounded-lg">
       <form phx-change="change_temperature_format" phx-target={@myself}>
         <div class="form-group">
-          <label for="temperature_format" class="block text-sm font-medium text-gray-700 mb-1 sm:mb-0">Formato de temperatura:</label>
+          <label for="temperature_format" class="block text-sm font-medium text-gray-700 mb-1 sm:mb-0">
+            Formato de temperatura:
+          </label>
           <select
             id="temperature_format"
             name="format"

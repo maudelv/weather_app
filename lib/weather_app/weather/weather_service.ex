@@ -25,7 +25,9 @@ defmodule WeatherApp.Weather.WeatherService do
     socket = Phoenix.Component.assign(socket, temperature_format: format)
 
     if socket.assigns.weather do
-      converted_weather = TemperatureConverter.convert_weather_data(socket.assigns.weather, format)
+      converted_weather =
+        TemperatureConverter.convert_weather_data(socket.assigns.weather, format)
+
       Phoenix.Component.assign(socket, weather: converted_weather)
     else
       socket
@@ -42,10 +44,11 @@ defmodule WeatherApp.Weather.WeatherService do
       socket = Phoenix.Component.assign(socket, cities: [], error: nil, loading_cities: true)
 
       # Start async task for city search
-      task = Task.async(fn ->
-        Process.sleep(500)
-        FindCities.find_cities(query)
-      end)
+      task =
+        Task.async(fn ->
+          Process.sleep(500)
+          FindCities.find_cities(query)
+        end)
 
       # Store task reference and send message when complete
       Process.send_after(self(), {:search_cities_complete, task, query}, 0)
@@ -59,18 +62,24 @@ defmodule WeatherApp.Weather.WeatherService do
     socket = Phoenix.Component.assign(socket, weather: nil, error: nil, loading_weather: true)
 
     # Start async task for weather data
-    task = Task.async(fn ->
-      Process.sleep(1000)
-      with {:ok, {lat_float, lon_float}} <- parse_coordinates(lat, lon),
-           {:ok, weather} <- WeatherData.get_current_weather(lat_float, lon_float, "metric") do
-        {:ok, weather}
-      else
-        {:error, reason} -> {:error, reason}
-      end
-    end)
+    task =
+      Task.async(fn ->
+        Process.sleep(1000)
+
+        with {:ok, {lat_float, lon_float}} <- parse_coordinates(lat, lon),
+             {:ok, weather} <- WeatherData.get_current_weather(lat_float, lon_float, "metric") do
+          {:ok, weather}
+        else
+          {:error, reason} -> {:error, reason}
+        end
+      end)
 
     # Store task reference and send message when complete
-    Process.send_after(self(), {:fetch_weather_complete, task, socket.assigns.temperature_format}, 0)
+    Process.send_after(
+      self(),
+      {:fetch_weather_complete, task, socket.assigns.temperature_format},
+      0
+    )
 
     socket
   end
@@ -81,11 +90,14 @@ defmodule WeatherApp.Weather.WeatherService do
     current_count = Favorites.count_favorites()
 
     if current_count >= 5 do
-      Phoenix.LiveView.put_flash(socket, :error, "No puedes añadir más de 5 ciudades a favoritos.")
+      Phoenix.LiveView.put_flash(
+        socket,
+        :error,
+        "No puedes añadir más de 5 ciudades a favoritos."
+      )
     else
       with %{"country_code" => country_code, "lat" => lat, "lon" => lon} <- params,
            {:ok, {lat_float, lon_float}} <- parse_coordinates(lat, lon) do
-
         city_data = build_city_data(params, country_code, lat_float, lon_float)
 
         case Favorites.add_favorite(city_data) do
@@ -102,12 +114,17 @@ defmodule WeatherApp.Weather.WeatherService do
         end
       else
         _error ->
-          Phoenix.LiveView.put_flash(socket, :error, "Datos de ciudad inválidos para añadir a favoritos.")
+          Phoenix.LiveView.put_flash(
+            socket,
+            :error,
+            "Datos de ciudad inválidos para añadir a favoritos."
+          )
       end
     end
   rescue
     Ecto.ConstraintError ->
       Phoenix.LiveView.put_flash(socket, :error, "Error: Esta ciudad ya está en favoritos.")
+
     _error ->
       Phoenix.LiveView.put_flash(socket, :error, "Error inesperado al procesar la solicitud.")
   end

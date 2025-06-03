@@ -7,6 +7,7 @@ defmodule WeatherAppWeb.WeatherLive do
     FavoriteCitiesComponent,
     TemperatureFormatComponent
   }
+
   alias WeatherApp.Weather.WeatherService
 
   @impl true
@@ -60,26 +61,49 @@ defmodule WeatherAppWeb.WeatherLive do
   def handle_info({:search_cities_complete, task, _query}, socket) do
     case Task.await(task, 5000) do
       {:ok, cities} ->
-        {:noreply, Phoenix.Component.assign(socket, cities: cities, error: nil, loading_cities: false)}
+        {:noreply,
+         Phoenix.Component.assign(socket, cities: cities, error: nil, loading_cities: false)}
+
       {:error, reason} ->
-        {:noreply, Phoenix.Component.assign(socket, error: reason, cities: [], loading_cities: false)}
+        {:noreply,
+         Phoenix.Component.assign(socket, error: reason, cities: [], loading_cities: false)}
     end
   rescue
     _ ->
-      {:noreply, Phoenix.Component.assign(socket, error: "Error al buscar ciudades", cities: [], loading_cities: false)}
+      {:noreply,
+       Phoenix.Component.assign(socket,
+         error: "Error al buscar ciudades",
+         cities: [],
+         loading_cities: false
+       )}
   end
 
   def handle_info({:fetch_weather_complete, task, temperature_format}, socket) do
     case Task.await(task, 10000) do
       {:ok, weather} ->
-        converted_weather = WeatherApp.Weather.TemperatureConverter.convert_weather_data(weather, temperature_format)
-        {:noreply, Phoenix.Component.assign(socket, weather: converted_weather, error: nil, loading_weather: false)}
+        converted_weather =
+          WeatherApp.Weather.TemperatureConverter.convert_weather_data(
+            weather,
+            temperature_format
+          )
+
+        {:noreply,
+         Phoenix.Component.assign(socket,
+           weather: converted_weather,
+           error: nil,
+           loading_weather: false
+         )}
+
       {:error, reason} ->
         {:noreply, Phoenix.Component.assign(socket, error: reason, loading_weather: false)}
     end
   rescue
     _ ->
-      {:noreply, Phoenix.Component.assign(socket, error: "Error al obtener datos del clima", loading_weather: false)}
+      {:noreply,
+       Phoenix.Component.assign(socket,
+         error: "Error al obtener datos del clima",
+         loading_weather: false
+       )}
   end
 
   @impl true

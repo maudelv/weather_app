@@ -19,14 +19,14 @@ defmodule WeatherApp.Controllers.Weather.WeatherDataTest do
         },
         "hourly" => [
           %{
-            "dt" => 1640995200,
+            "dt" => 1_640_995_200,
             "temp" => 21.0,
             "humidity" => 70,
             "weather" => [%{"description" => "parcialmente nublado", "icon" => "02d"}],
             "wind_speed" => 2.8
           },
           %{
-            "dt" => 1640998800,
+            "dt" => 1_640_998_800,
             "temp" => 23.0,
             "humidity" => 68,
             "weather" => [%{"description" => "soleado", "icon" => "01d"}],
@@ -35,14 +35,14 @@ defmodule WeatherApp.Controllers.Weather.WeatherDataTest do
         ],
         "daily" => [
           %{
-            "dt" => 1640995200,
+            "dt" => 1_640_995_200,
             "temp" => %{"day" => 20.0, "min" => 15.0, "max" => 25.0},
             "humidity" => 60,
             "weather" => [%{"description" => "soleado", "icon" => "01d"}],
             "wind_speed" => 4.0
           },
           %{
-            "dt" => 1641081600,
+            "dt" => 1_641_081_600,
             "temp" => %{"day" => 18.0, "min" => 12.0, "max" => 22.0},
             "humidity" => 55,
             "weather" => [%{"description" => "nublado", "icon" => "03d"}],
@@ -53,10 +53,11 @@ defmodule WeatherApp.Controllers.Weather.WeatherDataTest do
 
       HTTPoisonMock
       |> expect(:get, fn _url ->
-        {:ok, %HTTPoison.Response{
-          status_code: 200,
-          body: Jason.encode!(weather_response)
-        }}
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 200,
+           body: Jason.encode!(weather_response)
+         }}
       end)
 
       result = WeatherData.get_current_weather(40.4168, -3.7038, "metric")
@@ -78,7 +79,7 @@ defmodule WeatherApp.Controllers.Weather.WeatherDataTest do
       assert length(hourly) == 2
 
       first_hour = Enum.at(hourly, 0)
-      assert first_hour.time == 1640995200
+      assert first_hour.time == 1_640_995_200
       assert first_hour.temperature == 21.0
       assert first_hour.original_temperature == 21.0
       assert first_hour.temperature_unit == "metric"
@@ -92,7 +93,7 @@ defmodule WeatherApp.Controllers.Weather.WeatherDataTest do
       assert length(daily) == 2
 
       first_day = Enum.at(daily, 0)
-      assert first_day.date == 1640995200
+      assert first_day.date == 1_640_995_200
       assert first_day.temperature == 20.0
       assert first_day.temp_min == 15.0
       assert first_day.temp_max == 25.0
@@ -125,7 +126,9 @@ defmodule WeatherApp.Controllers.Weather.WeatherDataTest do
 
       result = WeatherData.get_current_weather(0.0, 0.0, "metric")
 
-      assert {:error, "No se pudieron obtener datos del clima para las coordenadas proporcionadas."} = result
+      assert {:error,
+              "No se pudieron obtener datos del clima para las coordenadas proporcionadas."} =
+               result
     end
 
     test "handles weather data with missing weather descriptions gracefully" do
@@ -138,7 +141,7 @@ defmodule WeatherApp.Controllers.Weather.WeatherDataTest do
         },
         "hourly" => [
           %{
-            "dt" => 1640995200,
+            "dt" => 1_640_995_200,
             "temp" => 21.0,
             "humidity" => 70,
             "weather" => nil,
@@ -147,7 +150,7 @@ defmodule WeatherApp.Controllers.Weather.WeatherDataTest do
         ],
         "daily" => [
           %{
-            "dt" => 1640995200,
+            "dt" => 1_640_995_200,
             "temp" => %{"day" => 20.0, "min" => 15.0, "max" => 25.0},
             "humidity" => 60,
             "weather" => [%{}],
@@ -158,10 +161,11 @@ defmodule WeatherApp.Controllers.Weather.WeatherDataTest do
 
       HTTPoisonMock
       |> expect(:get, fn _url ->
-        {:ok, %HTTPoison.Response{
-          status_code: 200,
-          body: Jason.encode!(weather_response)
-        }}
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 200,
+           body: Jason.encode!(weather_response)
+         }}
       end)
 
       result = WeatherData.get_current_weather(40.4168, -3.7038, "metric")
@@ -193,10 +197,11 @@ defmodule WeatherApp.Controllers.Weather.WeatherDataTest do
 
       HTTPoisonMock
       |> expect(:get, fn _url ->
-        {:ok, %HTTPoison.Response{
-          status_code: 200,
-          body: Jason.encode!(weather_response)
-        }}
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 200,
+           body: Jason.encode!(weather_response)
+         }}
       end)
 
       result = WeatherData.get_current_weather(40.4168, -3.7038, "imperial")
@@ -220,10 +225,11 @@ defmodule WeatherApp.Controllers.Weather.WeatherDataTest do
 
       HTTPoisonMock
       |> expect(:get, fn _url ->
-        {:ok, %HTTPoison.Response{
-          status_code: 200,
-          body: Jason.encode!(weather_response)
-        }}
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 200,
+           body: Jason.encode!(weather_response)
+         }}
       end)
 
       result = WeatherData.get_current_weather(40.4168, -3.7038, "metric")

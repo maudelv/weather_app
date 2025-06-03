@@ -18,34 +18,44 @@ defmodule WeatherApp.Controllers.Weather.ApiClient do
         case Jason.decode(response.body) do
           {:ok, decoded_response} ->
             validate_cities_response(decoded_response)
+
           {:error, reason} ->
             {:error, "Error al procesar la respuesta del API: #{reason}"}
         end
+
       {:ok, %HTTPoison.Response{status_code: 400}} ->
         {:error, "No se ha encontrado una ciudad con ese nombre o la solicitud es incorrecta."}
+
       {:ok, %HTTPoison.Response{status_code: code}} ->
         {:error, "Error del API: #{code}. Por favor, inténtalo de nuevo."}
+
       {:error, %HTTPoison.Error{reason: reason}} ->
         {:error, "Error de conexión: #{reason}"}
     end
   end
 
-  @spec get_weather_data(float(), float(), String.t(), module()) :: {:ok, map()} | {:error, String.t()}
+  @spec get_weather_data(float(), float(), String.t(), module()) ::
+          {:ok, map()} | {:error, String.t()}
   def get_weather_data(lat, lon, unit_measurement, http_client \\ @http_client) do
-    url = "#{base_url()}/data/3.0/onecall?lat=#{lat}&lon=#{lon}&exclude=minutely,alerts&appid=#{api_key()}&units=#{unit_measurement}&lang=es"
+    url =
+      "#{base_url()}/data/3.0/onecall?lat=#{lat}&lon=#{lon}&exclude=minutely,alerts&appid=#{api_key()}&units=#{unit_measurement}&lang=es"
 
     case http_client.get(url) do
       {:ok, response} when response.status_code == 200 ->
         case Jason.decode(response.body) do
           {:ok, decoded_response} ->
             {:ok, decoded_response}
+
           {:error, reason} ->
             {:error, "Error al procesar la respuesta del API del clima: #{reason}"}
         end
+
       {:ok, %HTTPoison.Response{status_code: 400}} ->
         {:error, "No se pudieron obtener datos del clima para las coordenadas proporcionadas."}
+
       {:ok, %HTTPoison.Response{status_code: code}} ->
         {:error, "Error del API del clima: #{code}. Por favor, inténtalo de nuevo."}
+
       {:error, %HTTPoison.Error{reason: reason}} ->
         {:error, "Error de conexión al obtener el clima: #{reason}"}
     end

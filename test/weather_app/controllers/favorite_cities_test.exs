@@ -180,16 +180,17 @@ defmodule WeatherApp.Controllers.Weather.FavoritesTest do
 
   # Helper function to create favorite cities for testing
   defp create_favorite_city(name, country_code, position) do
-    {:ok, city} = %FavoriteCity{}
-    |> FavoriteCity.changeset(%{
-      name: name,
-      country_code: country_code,
-      state: "Test State",
-      lat: 40.0 + position,
-      lon: -3.0 + position,
-      position: position
-    })
-    |> Repo.insert()
+    {:ok, city} =
+      %FavoriteCity{}
+      |> FavoriteCity.changeset(%{
+        name: name,
+        country_code: country_code,
+        state: "Test State",
+        lat: 40.0 + position,
+        lon: -3.0 + position,
+        position: position
+      })
+      |> Repo.insert()
 
     city
   end

@@ -27,10 +27,11 @@ defmodule WeatherApp.Controllers.Weather.FindCitiesTest do
 
       HTTPoisonMock
       |> expect(:get, fn _url ->
-        {:ok, %HTTPoison.Response{
-          status_code: 200,
-          body: Jason.encode!(cities_response)
-        }}
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 200,
+           body: Jason.encode!(cities_response)
+         }}
       end)
 
       result = FindCities.find_cities("Madrid")
@@ -85,10 +86,11 @@ defmodule WeatherApp.Controllers.Weather.FindCitiesTest do
 
       HTTPoisonMock
       |> expect(:get, fn _url ->
-        {:ok, %HTTPoison.Response{
-          status_code: 200,
-          body: Jason.encode!(cities_response)
-        }}
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 200,
+           body: Jason.encode!(cities_response)
+         }}
       end)
 
       result = FindCities.find_cities("Madrid")
@@ -114,10 +116,11 @@ defmodule WeatherApp.Controllers.Weather.FindCitiesTest do
     test "handles API returning empty array" do
       HTTPoisonMock
       |> expect(:get, fn _url ->
-        {:ok, %HTTPoison.Response{
-          status_code: 200,
-          body: "[]"
-        }}
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 200,
+           body: "[]"
+         }}
       end)
 
       result = FindCities.find_cities("NonExistentCity")
@@ -137,10 +140,11 @@ defmodule WeatherApp.Controllers.Weather.FindCitiesTest do
 
       HTTPoisonMock
       |> expect(:get, fn _url ->
-        {:ok, %HTTPoison.Response{
-          status_code: 200,
-          body: Jason.encode!(cities_response)
-        }}
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 200,
+           body: Jason.encode!(cities_response)
+         }}
       end)
 
       result = FindCities.find_cities("  Madrid  ")

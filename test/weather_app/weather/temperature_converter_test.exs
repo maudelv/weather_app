@@ -17,13 +17,13 @@ defmodule WeatherApp.Weather.TemperatureConverterTest do
             temperature: 18.0,
             original_temperature: 18.0,
             humidity: 70,
-            time: 1640995200
+            time: 1_640_995_200
           },
           %{
             temperature: 22.0,
             original_temperature: 22.0,
             humidity: 68,
-            time: 1640998800
+            time: 1_640_998_800
           }
         ],
         weekly_weather: [
@@ -35,7 +35,7 @@ defmodule WeatherApp.Weather.TemperatureConverterTest do
             original_temp_min: 15.0,
             original_temp_max: 25.0,
             humidity: 60,
-            date: 1640995200
+            date: 1_640_995_200
           }
         ]
       }

@@ -28,10 +28,11 @@ defmodule WeatherApp.Controllers.Weather.ApiClientTest do
       # Configurar el mock
       HTTPoisonMock
       |> expect(:get, fn _url ->
-        {:ok, %HTTPoison.Response{
-          status_code: 200,
-          body: Jason.encode!(cities_response)
-        }}
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 200,
+           body: Jason.encode!(cities_response)
+         }}
       end)
 
       # Ejecutar la función
@@ -47,10 +48,11 @@ defmodule WeatherApp.Controllers.Weather.ApiClientTest do
     test "returns error when no cities found" do
       HTTPoisonMock
       |> expect(:get, fn _url ->
-        {:ok, %HTTPoison.Response{
-          status_code: 200,
-          body: "[]"
-        }}
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 200,
+           body: "[]"
+         }}
       end)
 
       result = ApiClient.search_cities("NonExistentCity", HTTPoisonMock)
@@ -66,7 +68,9 @@ defmodule WeatherApp.Controllers.Weather.ApiClientTest do
 
       result = ApiClient.search_cities("", HTTPoisonMock)
 
-      assert {:error, "No se ha encontrado una ciudad con ese nombre o la solicitud es incorrecta."} = result
+      assert {:error,
+              "No se ha encontrado una ciudad con ese nombre o la solicitud es incorrecta."} =
+               result
     end
 
     test "returns error when API responds with other error codes" do
@@ -103,7 +107,7 @@ defmodule WeatherApp.Controllers.Weather.ApiClientTest do
         },
         "hourly" => [
           %{
-            "dt" => 1640995200,
+            "dt" => 1_640_995_200,
             "temp" => 21.0,
             "humidity" => 70,
             "weather" => [%{"description" => "parcialmente nublado", "icon" => "02d"}],
@@ -112,7 +116,7 @@ defmodule WeatherApp.Controllers.Weather.ApiClientTest do
         ],
         "daily" => [
           %{
-            "dt" => 1640995200,
+            "dt" => 1_640_995_200,
             "temp" => %{"day" => 20.0, "min" => 15.0, "max" => 25.0},
             "humidity" => 60,
             "weather" => [%{"description" => "soleado", "icon" => "01d"}],
@@ -123,10 +127,11 @@ defmodule WeatherApp.Controllers.Weather.ApiClientTest do
 
       HTTPoisonMock
       |> expect(:get, fn _url ->
-        {:ok, %HTTPoison.Response{
-          status_code: 200,
-          body: Jason.encode!(weather_response)
-        }}
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 200,
+           body: Jason.encode!(weather_response)
+         }}
       end)
 
       result = ApiClient.get_weather_data(40.4168, -3.7038, "metric", HTTPoisonMock)
@@ -146,7 +151,9 @@ defmodule WeatherApp.Controllers.Weather.ApiClientTest do
 
       result = ApiClient.get_weather_data(0.0, 0.0, "metric", HTTPoisonMock)
 
-      assert {:error, "No se pudieron obtener datos del clima para las coordenadas proporcionadas."} = result
+      assert {:error,
+              "No se pudieron obtener datos del clima para las coordenadas proporcionadas."} =
+               result
     end
 
     test "returns error when API responds with other error codes" do

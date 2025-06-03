@@ -23,7 +23,7 @@ defmodule WeatherAppWeb.WeatherLive.Components.FavoriteCitiesComponent do
     <div class="favorite-cities shadow-lg p-6 mb-6 bg-white rounded-lg">
       <div class="flex justify-between items-center mb-4">
         <h2 class="block text-md font-medium text-gray-700">Ciudades favoritas</h2>
-        <span class="text-sm text-gray-500">(<%= length(@favorite_cities) %>/5)</span>
+        <span class="text-sm text-gray-500">({length(@favorite_cities)}/5)</span>
       </div>
 
       <%= if Enum.empty?(@favorite_cities) do %>
@@ -37,7 +37,9 @@ defmodule WeatherAppWeb.WeatherLive.Components.FavoriteCitiesComponent do
             <%= for favorite <- @favorite_cities do %>
               <li class="city-item p-4 bg-blue-50 border border-blue-200 rounded-md shadow-sm">
                 <div class="city-info flex justify-between items-center mb-2">
-                  <span class="text-md font-semibold text-blue-800"><%= favorite.name %>, <%= favorite.country_code %></span>
+                  <span class="text-md font-semibold text-blue-800">
+                    {favorite.name}, {favorite.country_code}
+                  </span>
                 </div>
                 <div class="city-actions flex space-x-2">
                   <button
@@ -58,8 +60,14 @@ defmodule WeatherAppWeb.WeatherLive.Components.FavoriteCitiesComponent do
                     data-confirm="¿Estás seguro de eliminar esta ciudad de favoritos?"
                     title="Eliminar de favoritos"
                   >
-                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
-                      <path d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z"/>
+                    <svg
+                      class="w-4 h-4"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 18 20"
+                    >
+                      <path d="M17 4h-4V2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2H1a1 1 0 0 0 0 2h1v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1a1 1 0 1 0 0-2ZM7 2h4v2H7V2Zm1 14a1 1 0 1 1-2 0V8a1 1 0 0 1 2 0v8Zm4 0a1 1 0 0 1-2 0V8a1 1 0 0 1 2 0v8Z" />
                     </svg>
                     <span class="sr-only">Eliminar de favoritos</span>
                   </button>

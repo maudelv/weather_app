@@ -12,7 +12,12 @@ defmodule WeatherAppWeb.WeatherLive.Components.WeatherDisplayComponent do
   def render(assigns) do
     ~H"""
     <div class="weather-display max-w-5xl mx-auto p-4 md:p-6">
-      <%= if @weather do %>
+        <%= if @loading do %>
+          <div class="loading-weather flex flex-col items-center justify-center py-16 bg-blue-50 border border-blue-200 rounded-lg">
+            <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mb-4"></div>
+          </div>
+        <% end %>
+      <%= if @weather && !@loading do %>
         <!-- Clima Actual -->
         <div class="weather-section current-weather bg-white p-6 rounded-lg shadow-lg mb-8">
           <h2 class="text-2xl font-bold text-blue-700 mb-6 text-center md:text-left">🌤️ Clima actual</h2>
@@ -128,12 +133,12 @@ defmodule WeatherAppWeb.WeatherLive.Components.WeatherDisplayComponent do
             <% end %>
           </div>
         </div>
-
-      <% else %>
-        <div class="no-weather bg-white p-8 rounded-lg shadow-lg text-center">
-          <p class="text-lg text-gray-600">Selecciona una ciudad para ver el clima actual</p>
-        </div>
       <% end %>
+        <%= if  !@weather && !@loading do %>
+          <div class="no-weather bg-white p-8 rounded-lg shadow-lg text-center">
+            <p class="text-lg text-gray-600">Selecciona una ciudad para ver el clima actual</p>
+          </div>
+        <% end %>
     </div>
     """
   end

@@ -54,7 +54,13 @@ defmodule WeatherAppWeb.WeatherLive.Components.CitySearchComponent do
           <p class="error mt-4 p-3 text-sm text-red-700 bg-red-100 border border-red-300 rounded-md"><%= @error %></p>
         <% end %>
 
-        <%= if not Enum.empty?(@cities) do %>
+        <%= if @loading do %>
+          <div class="mt-6 loading-spinner flex items-center justify-center py-4 bg-blue-50 border border-blue-200 rounded-md">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-2"></div>
+          </div>
+        <% end %>
+
+        <%= if not Enum.empty?(@cities) && !@loading do %>
           <div class="cities-list mt-6">
             <ul class="space-y-3">
               <%= for city <- @cities do %>

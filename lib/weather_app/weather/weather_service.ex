@@ -14,7 +14,9 @@ defmodule WeatherApp.Weather.WeatherService do
       weather: nil,
       temperature_format: "celsius",
       error: nil,
-      favorite_cities: Favorites.list_favorites()
+      favorite_cities: Favorites.list_favorites(),
+      loading_cities: false,
+      loading_weather: false
     )
   end
 
@@ -33,30 +35,44 @@ defmodule WeatherApp.Weather.WeatherService do
   @spec search_cities(Socket.t(), String.t()) :: Socket.t()
   def search_cities(socket, query) do
     query = String.trim(query)
-    socket = Phoenix.Component.assign(socket, cities: [], error: nil)
 
     if query == "" do
-      socket
+      Phoenix.Component.assign(socket, cities: [], error: nil, loading_cities: false)
     else
-      case FindCities.find_cities(query) do
-        {:ok, cities} ->
-          Phoenix.Component.assign(socket, cities: cities, error: nil)
-        {:error, reason} ->
-          Phoenix.Component.assign(socket, error: reason, cities: [])
-      end
+      socket = Phoenix.Component.assign(socket, cities: [], error: nil, loading_cities: true)
+
+      # Start async task for city search
+      task = Task.async(fn ->
+        Process.sleep(500)
+        FindCities.find_cities(query)
+      end)
+
+      # Store task reference and send message when complete
+      Process.send_after(self(), {:search_cities_complete, task, query}, 0)
+
+      socket
     end
   end
 
   @spec fetch_weather_data(Socket.t(), String.t(), String.t()) :: Socket.t()
   def fetch_weather_data(socket, lat, lon) do
-    with {:ok, {lat_float, lon_float}} <- parse_coordinates(lat, lon),
-         {:ok, weather} <- WeatherData.get_current_weather(lat_float, lon_float, "metric") do
-      converted_weather = TemperatureConverter.convert_weather_data(weather, socket.assigns.temperature_format)
-      Phoenix.Component.assign(socket, weather: converted_weather, error: nil)
-    else
-      {:error, reason} ->
-        Phoenix.Component.assign(socket, error: reason)
-    end
+    socket = Phoenix.Component.assign(socket, weather: nil, error: nil, loading_weather: true)
+
+    # Start async task for weather data
+    task = Task.async(fn ->
+      Process.sleep(1000)
+      with {:ok, {lat_float, lon_float}} <- parse_coordinates(lat, lon),
+           {:ok, weather} <- WeatherData.get_current_weather(lat_float, lon_float, "metric") do
+        {:ok, weather}
+      else
+        {:error, reason} -> {:error, reason}
+      end
+    end)
+
+    # Store task reference and send message when complete
+    Process.send_after(self(), {:fetch_weather_complete, task, socket.assigns.temperature_format}, 0)
+
+    socket
   end
 
   @spec add_city_to_favorites(Socket.t(), map()) :: Socket.t()
@@ -105,7 +121,6 @@ defmodule WeatherApp.Weather.WeatherService do
   end
 
   # Private functions
-
   defp parse_coordinates(lat, lon) do
     try do
       lat_float = String.to_float(lat)

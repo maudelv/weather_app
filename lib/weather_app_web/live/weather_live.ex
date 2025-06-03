@@ -130,7 +130,7 @@ defmodule WeatherAppWeb.WeatherLive do
             favorite_cities={@favorite_cities}
           />
         </div>
-        <div class="col-span-9 shadow-lg p-4 mb-4 bg-white rounded">
+        <div class="col-span-9 shadow-lg p-4 bg-white rounded">
           <.live_component
             module={WeatherDisplayComponent}
             id="weather-display"

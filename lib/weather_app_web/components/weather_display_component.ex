@@ -91,7 +91,7 @@ defmodule WeatherAppWeb.WeatherLive.Components.WeatherDisplayComponent do
             </div>
           </div>
         </div>
-        
+
     <!-- Pronóstico por Horas (Próximas 24 horas) -->
         <div class="weather-section hourly-weather bg-white p-6 rounded-lg shadow-lg mb-8">
           <h3 class="text-xl font-bold text-blue-700 mb-4">📊 Próximas 24 horas</h3>
@@ -126,7 +126,7 @@ defmodule WeatherAppWeb.WeatherLive.Components.WeatherDisplayComponent do
             <% end %>
           </div>
         </div>
-        
+
     <!-- Pronóstico Semanal -->
         <div class="weather-section weekly-weather bg-white p-6 rounded-lg shadow-lg">
           <h3 class="text-xl font-bold text-blue-700 mb-4">📅 Resto de la semana</h3>
